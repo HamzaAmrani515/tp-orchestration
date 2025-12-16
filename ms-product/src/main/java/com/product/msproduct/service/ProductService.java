@@ -2,29 +2,36 @@ package com.product.msproduct.service;
 
 import com.product.msproduct.domain.Product;
 import com.product.msproduct.repository.ProductRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ProductService {
 
-    private final ProductRepository repository;
+    private final ProductRepository productRepository;
 
-    public ProductService(ProductRepository repository) {
-        this.repository = repository;
+    public List<Product> getAll() {
+        return productRepository.findAll();
     }
 
-    public List<Product> findAll() {
-        return repository.findAll();
-    }
-
-    public Product findById(Long id) {
-        return repository.findById(id)
+    public Product getById(Long id) {
+        return productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
     }
 
-    public Product save(Product product) {
-        return repository.save(product);
+    public Product create(Product product) {
+        product.setId(null);
+        return productRepository.save(product);
+    }
+
+    public List<Product> byCategory(String category) {
+        return productRepository.findByCategory(category);
+    }
+
+    public List<Product> available() {
+        return productRepository.findByActiveTrueAndQuantityGreaterThan(0);
     }
 }
