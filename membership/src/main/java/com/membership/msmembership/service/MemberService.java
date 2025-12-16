@@ -17,8 +17,13 @@ public class MemberService {
         return repository.findAll();
     }
 
+    public Member getById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Member not found"));
+    }
+
     public Member create(Member member) {
-        member.setId(null); // sécurité
+        member.setId(null);
         return repository.save(member);
     }
 }

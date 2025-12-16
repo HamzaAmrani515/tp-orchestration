@@ -1,12 +1,13 @@
-package com.membership.users;
+package com.membership.msorder;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class MembershipApplication {
+public class MsOrderApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(MembershipApplication.class, args);
+        SpringApplication.run(MsOrderApplication.class, args);
     }
+
 }

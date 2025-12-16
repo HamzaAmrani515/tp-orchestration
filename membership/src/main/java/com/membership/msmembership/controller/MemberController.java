@@ -20,6 +20,11 @@ public class MemberController {
         return memberService.getAll();
     }
 
+    @GetMapping("/{id}")
+    public Member getById(@PathVariable Long id) {
+        return memberService.getById(id);
+    }
+
     @PostMapping
     public Member create(@RequestBody @Valid Member member) {
         return memberService.create(member);

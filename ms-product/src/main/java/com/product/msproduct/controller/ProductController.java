@@ -1,5 +1,6 @@
 package com.product.msproduct.controller;
 
+import com.product.msproduct.client.MembershipClient;
 import com.product.msproduct.domain.Product;
 import com.product.msproduct.service.ProductService;
 import jakarta.validation.Valid;
@@ -14,6 +15,7 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
+    private final MembershipClient membershipClient;
 
     @GetMapping
     public List<Product> getAll() {
@@ -38,5 +40,13 @@ public class ProductController {
     @GetMapping("/available")
     public List<Product> available() {
         return productService.available();
+    }
+
+
+    @GetMapping("/check-member/{memberId}")
+    public String checkMember(@PathVariable Long memberId) {
+        return membershipClient.memberExists(memberId)
+                ? "MEMBER EXISTS"
+                : "MEMBER NOT FOUND";
     }
 }
