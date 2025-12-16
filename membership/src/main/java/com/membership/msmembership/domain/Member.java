@@ -6,12 +6,15 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Entity
-@Table(name = "members")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(
+        name = "members",
+        uniqueConstraints = @UniqueConstraint(columnNames = "email")
+)
 public class Member {
 
     @Id
@@ -24,11 +27,10 @@ public class Member {
     @NotBlank
     private String lastName;
 
-    @Email
     @NotBlank
-    @Column(unique = true)
+    @Email
+    @Column(nullable = false, unique = true)
     private String email;
 
     private boolean active;
 }
-
