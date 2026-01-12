@@ -2,16 +2,18 @@ package com.membership.msmembership.service;
 
 import com.membership.msmembership.domain.Member;
 import com.membership.msmembership.repository.MemberRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class MemberService {
 
     private final MemberRepository repository;
+
+    public MemberService(MemberRepository repository) {
+        this.repository = repository;
+    }
 
     public List<Member> getAll() {
         return repository.findAll();
@@ -23,7 +25,14 @@ public class MemberService {
     }
 
     public Member create(Member member) {
-        member.setId(null);
-        return repository.save(member);
+        Member toSave = new Member();
+        toSave.setFirstName(member.getFirstName());
+        toSave.setLastName(member.getLastName());
+        toSave.setEmail(member.getEmail());
+        toSave.setPasswordHash(member.getPasswordHash());
+        toSave.setRoles(member.getRoles());
+        toSave.setActive(member.isActive());
+
+        return repository.save(toSave);
     }
 }
