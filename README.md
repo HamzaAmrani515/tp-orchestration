@@ -50,4 +50,4 @@
 - Postman : `postman/platform-tests.json`
 
 ## Auteur
-Hamza Amrani
+Hamza EL Amrani

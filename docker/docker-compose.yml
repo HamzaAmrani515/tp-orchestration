@@ -1,0 +1,106 @@
+services:
+  membership:
+    build:
+      context: ../membership
+    image: ecommerce-membership:1.0
+    container_name: membership
+    ports:
+      - "8081:8081"
+    networks:
+      - ecommerce-net
+    healthcheck:
+      test: ["CMD", "sh", "-lc", "wget -qO- http://localhost:8081/actuator/health | grep -q UP"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+
+  product:
+    build:
+      context: ../ms-product
+    image: ecommerce-product:1.0
+    container_name: product
+    ports:
+      - "8082:8082"
+    networks:
+      - ecommerce-net
+    depends_on:
+      membership:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "sh", "-lc", "wget -qO- http://localhost:8082/actuator/health | grep -q UP"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+
+  order:
+    build:
+      context: ../ms-order
+    image: ecommerce-order:1.0
+    container_name: order
+    ports:
+      - "8083:8083"
+    networks:
+      - ecommerce-net
+    depends_on:
+      membership:
+        condition: service_healthy
+      product:
+        condition: service_healthy
+    environment:
+      # --- URL inter-services (mets tout, ça n’abîme rien si certaines ne servent pas) ---
+      MEMBERSHIP_BASE_URL: "http://membership:8081"
+      PRODUCT_BASE_URL: "http://product:8082"
+
+      MEMBERSHIP_URL: "http://membership:8081"
+      PRODUCT_URL: "http://product:8082"
+
+      MEMBERSHIP_HOST: "membership"
+      MEMBERSHIP_PORT: "8081"
+      PRODUCT_HOST: "product"
+      PRODUCT_PORT: "8082"
+    healthcheck:
+      test: ["CMD", "sh", "-lc", "wget -qO- http://localhost:8083/actuator/health | grep -q UP"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+
+  prometheus:
+    image: prom/prometheus:v2.53.1
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    networks:
+      - ecommerce-net
+    depends_on:
+      membership:
+        condition: service_healthy
+      product:
+        condition: service_healthy
+      order:
+        condition: service_healthy
+
+  grafana:
+    image: grafana/grafana:10.4.6
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - ecommerce-net
+    depends_on:
+      prometheus:
+        condition: service_started
+
+networks:
+  ecommerce-net:
+
+volumes:
+  prometheus_data:
+  grafana_data:
